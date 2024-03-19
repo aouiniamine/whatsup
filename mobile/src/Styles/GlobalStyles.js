@@ -1,5 +1,5 @@
 import {Dimensions, StyleSheet} from 'react-native';
-export const lightgreen = "#e3ffee"
+export const lightgreen = "#acf2bb"
 export const darkgreen = "#53ad77"
 
 export const windowWidth = Dimensions.get('window').width;
