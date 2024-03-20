@@ -11,7 +11,7 @@ func main() {
 	router := auth.AuthRouter()
 
 	port := 8080
-	addr := fmt.Sprintf("localhost:%d", port)
+	addr := fmt.Sprintf("192.168.0.4:%d", port)
 	fmt.Println("Server running on port:", port)
 	fmt.Println(addr)
 	err := http.ListenAndServe(addr, router)
