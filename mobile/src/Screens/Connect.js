@@ -3,11 +3,15 @@ import CustomInput from "../components/atoms/CustomInput"
 import { darkgreen, lightgreen, windowWidth } from "../Styles/GlobalStyles"
 import { useState } from "react"
 import CustomButton from "../components/atoms/CustomButton"
+import { connect } from "../utils/Repo/Auth"
 
 const Connect = () =>{
     const [credentail, setCredential ] = useState("")
     const logAccount = () =>{
-        console.log(credentail)
+        connect(credentail)
+        .then(res => console.log(res.data))
+        .catch(e => { console.log('fetch error test server: ', e); throw e})
+        
     }
     return (
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
