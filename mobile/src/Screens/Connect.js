@@ -10,7 +10,7 @@ const Connect = () =>{
     const logAccount = () =>{
         connect(credentail)
         .then(res => console.log(res.data))
-        .catch(e => { console.log('fetch error test server: ', e); throw e})
+        .catch(e => { console.log('error: ', e); throw e})
         
     }
     return (
