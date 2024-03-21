@@ -1,0 +1,6 @@
+CREATE DATABASE whatsup
+CREATE TABLE users (
+    id serial PRIMARY KEY,
+	username VARCHAR ( 50 ) UNIQUE NOT NULL,
+	email VARCHAR ( 50 ) UNIQUE NOT NULL
+)
