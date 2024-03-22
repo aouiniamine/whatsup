@@ -5,23 +5,32 @@ import { useState } from "react"
 import CustomButton from "../components/atoms/CustomButton"
 import { connect } from "../utils/Repo/Auth"
 
-const Connect = () =>{
-    const [credentail, setCredential ] = useState("")
-    const logAccount = () =>{
-        connect(credentail)
-        .then(res => console.log(res.data))
-        .catch(e => { console.log('error: ', e); throw e})
+const Connect = ({navigation}) =>{
+    const [credential, setCredential ] = useState("")
+    const [error, setError] = useState('')
+    const register = ()=> navigation.navigate("Register")
+    const logAccount = async() =>{
+        try{
+            const res = await connect(credential)
+            console.log(res)
+            
+        }catch(err) { console.log('error: ', err); setError(err)}
         
     }
     return (
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={style.wrapper}>
-                <View style={style.container}>
-                    <Text style={style.title}>Connect Account</Text>
-                    <CustomInput placeholder={"E-mail or username"} onChange={setCredential} />
-                    <CustomButton text={"Connect"} onPress={logAccount} style={{width: 250}}/>
-                
+                <View style={style.mainContainer}>
+
+                    <View style={style.container}>
+                        <Text style={style.title}>Connect Account</Text>
+                        <CustomInput placeholder={"E-mail or username"} onChange={setCredential} />
+                        <CustomButton text={"Connect"} onPress={logAccount} style={{width: 250}}/>
+                    </View>
+                    <Text onPress={register} style={style.register}>create an account ?</Text>
+                    {error && <Text style={style.error} >{error}</Text>}
                 </View>
+            
         </KeyboardAvoidingView>
     )
 }
@@ -33,6 +42,9 @@ const style = StyleSheet.create({
         alignItems: 'center',
         justifyContent: "center"
     },
+    mainContainer: {
+        gap: 10
+    },
     container: {
         gap: 20,
     },
@@ -40,6 +52,17 @@ const style = StyleSheet.create({
         fontSize: 25,
         fontWeight: '500',
         color: darkgreen,
+    },
+    error: {
+        
+        textAlign: "center",
+        color: 'white',
+        fontSize: 19
+    },
+    register: {
+        textAlign: "center",
+        color: "grey",
+        fontSize: 19
     }
 })
 
