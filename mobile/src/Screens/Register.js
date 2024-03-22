@@ -4,6 +4,7 @@ import { darkgreen, lightgreen, windowWidth } from "../Styles/GlobalStyles"
 import { useState } from "react"
 import CustomButton from "../components/atoms/CustomButton"
 import { connect, register } from "../utils/Repo/Auth"
+import { validateEmail, validateUsername } from "../utils/general"
 
 const Register = ({navigation}) =>{
     const [email, setEmail ] = useState("")
@@ -11,11 +12,22 @@ const Register = ({navigation}) =>{
     const [username, setUsername] = useState('')
     const registerAccount = async() =>{
         try{
-            const credential = {
-                email, username
+            const validEmail = validateEmail(email)
+            const validUsername = validateUsername(username)
+            if(validEmail && validUsername){
+                
+                const credential = {
+                    email, username
+                }
+                const res = await register(credential)
+                console.log(res, credential)
+            } else{
+                
+                console.log("email is valid:", validEmail)
+                console.log("username is valid:", validUsername)
+                 
             }
-            const res = await register(credential)
-            console.log(res, credential)
+
         }catch(err){ console.log(err); throw err}
         
     }
@@ -27,7 +39,7 @@ const Register = ({navigation}) =>{
                     <View style={style.container}>
                         <Text style={style.title}>Register Account</Text>
                         <CustomInput placeholder={"E-mail"} onChange={setEmail} />
-                        <CustomInput placeholder={"Password"} onChange={setUsername}/>
+                        <CustomInput placeholder={"Username"} onChange={setUsername}/>
                         <CustomButton text={"Connect"} onPress={registerAccount} style={{width: 250}}/>
                     </View>
                     
