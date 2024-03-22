@@ -16,7 +16,7 @@ type ConnectBody struct {
 }
 
 type User struct {
-	Id    int    `db:"id" json:"id"`
+	Id    int    `db:"id"`
 	Name  string `db:"username" json:"username"`
 	Email string `db:"email" json:"email"`
 }
@@ -31,14 +31,23 @@ func AuthRouter() http.Handler {
 func register(w http.ResponseWriter, r *http.Request) {
 	var body User
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		errors.InternalServerError(w, r)
+		errors.InternalServerError(w)
+
 		return
 	}
-	fmt.Println("user is registring:", body.Email, body.Name)
-	// db := db.DBConnection
+	db := db.DBConnection
+
+	if err := db.QueryRow(
+		"INSERT INTO users (email, username) VALUES ($1, $2) RETURNING email",
+		body.Email, body.Name).Scan(&body.Email); err != nil {
+		fmt.Println("database error on register", err.Error())
+		errors.UserAlreadyExist(w, err)
+		return
+	}
+
 	jsonRes, err := json.Marshal(body)
 	if err != nil {
-		errors.InternalServerError(w, r)
+		errors.InternalServerError(w)
 		return
 	}
 
@@ -50,7 +59,8 @@ func connect(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("request has came!!")
 	var body ConnectBody
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		errors.InternalServerError(w, r)
+		errors.InternalServerError(w)
+
 		return
 	}
 	db := db.DBConnection
@@ -62,13 +72,15 @@ func connect(w http.ResponseWriter, r *http.Request) {
 		return
 	} else if err != nil {
 		fmt.Println(err)
-		errors.InternalServerError(w, r)
+		errors.InternalServerError(w)
+
 		return
 	}
 
 	jsonRes, err := json.Marshal(user)
 	if err != nil {
-		errors.InternalServerError(w, r)
+		errors.InternalServerError(w)
+
 		return
 	}
 
