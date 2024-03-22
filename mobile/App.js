@@ -5,6 +5,7 @@ import { lightgreen } from './src/Styles/GlobalStyles';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Connect from './src/Screens/Connect';
+import Register from './src/Screens/Register';
 
 const Stack = createNativeStackNavigator();
 
@@ -14,6 +15,7 @@ export default function App() {
       <Stack.Navigator screenOptions={{headerShown: false}} initialRouteName='Connect'>
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Connect" component={Connect} />
+        <Stack.Screen name="Register" component={Register} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -24,7 +24,26 @@ type User struct {
 func AuthRouter() http.Handler {
 	r := mux.NewRouter()
 	r.HandleFunc("/auth/connect", connect).Methods("POST")
+	r.HandleFunc("/auth/register", register).Methods("POST")
 	return r
+}
+
+func register(w http.ResponseWriter, r *http.Request) {
+	var body User
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		errors.InternalServerError(w, r)
+		return
+	}
+	fmt.Println("user is registring:", body.Email, body.Name)
+	// db := db.DBConnection
+	jsonRes, err := json.Marshal(body)
+	if err != nil {
+		errors.InternalServerError(w, r)
+		return
+	}
+
+	w.Write(jsonRes)
+
 }
 
 func connect(w http.ResponseWriter, r *http.Request) {
