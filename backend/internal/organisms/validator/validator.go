@@ -23,7 +23,7 @@ func randRangeCrypto() (int64, error) {
 	return n.Int64() + min, nil
 }
 
-func ValidateEmail(user structs.User) error {
+func ValidateWithEmail(user structs.User) error {
 	generatedInt, err := randRangeCrypto()
 	if err != nil {
 		return err
@@ -53,9 +53,6 @@ func ValidateEmail(user structs.User) error {
 
 func sendValidationEmail(receiver string, validationCode int) error {
 
-	// smtp server configuration.
-	smtpHost := "smtp.gmail.com"
-	smtpPort := "587"
 	content := fmt.Sprintf("Your validation code is: %d", validationCode)
 
 	sender := fmt.Sprintf("From: <%s>\r\n", From)
@@ -68,10 +65,10 @@ func sendValidationEmail(receiver string, validationCode int) error {
 	messageFormat := []byte(msg)
 
 	// Authentication.
-	auth := smtp.PlainAuth("", From, Password, smtpHost)
+	auth := smtp.PlainAuth("", From, Password, SmtpHost)
 
 	// Sending email.
-	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, From, []string{receiver}, messageFormat)
+	err := smtp.SendMail(SmtpHost+":"+SmtpPort, auth, From, []string{receiver}, messageFormat)
 	if err != nil {
 		fmt.Println(err)
 		return err
