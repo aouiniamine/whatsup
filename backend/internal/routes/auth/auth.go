@@ -8,6 +8,8 @@ import (
 
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/db"
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/errors"
+	"github.com/aouiniamine/whatsup/backend/internal/organisms/structs"
+	"github.com/aouiniamine/whatsup/backend/internal/organisms/validator"
 	"github.com/gorilla/mux"
 )
 
@@ -15,10 +17,17 @@ type ConnectBody struct {
 	Credential string `json:"credential"`
 }
 
-type User struct {
-	Id    int    `db:"id"`
-	Name  string `db:"username" json:"username"`
-	Email string `db:"email" json:"email"`
+type ValidateReq struct {
+	Email string `json:"email"`
+	Code  int    `json:"code"`
+}
+
+// type ValidteRes struct {
+// 	Token string `json: token`
+// }
+
+type ValidateRes struct {
+	Email string `json:"email"`
 }
 
 func AuthRouter() http.Handler {
@@ -29,7 +38,7 @@ func AuthRouter() http.Handler {
 }
 
 func register(w http.ResponseWriter, r *http.Request) {
-	var body User
+	var body structs.User
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		errors.InternalServerError(w)
 
@@ -38,14 +47,21 @@ func register(w http.ResponseWriter, r *http.Request) {
 	db := db.DBConnection
 
 	if err := db.QueryRow(
-		"INSERT INTO users (email, username) VALUES ($1, $2) RETURNING email",
-		body.Email, body.Name).Scan(&body.Email); err != nil {
+		"INSERT INTO users (email, username) VALUES ($1, $2) RETURNING id",
+		body.Email, body.Name).Scan(&body.Id); err != nil {
 		fmt.Println("database error on register", err.Error())
 		errors.UserAlreadyExist(w, err)
 		return
 	}
+	fmt.Println("user is created")
+	err := validator.ValidateWithEmail(body)
+	if err != nil {
+		fmt.Println("error on email validation:", err)
+		errors.InternalServerError(w)
+		return
+	}
 
-	jsonRes, err := json.Marshal(body)
+	jsonRes, err := json.Marshal(ValidateRes{Email: body.Email})
 	if err != nil {
 		errors.InternalServerError(w)
 		return
@@ -64,10 +80,10 @@ func connect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	db := db.DBConnection
-	var user User
-	row := db.QueryRow("SELECT * FROM users WHERE username = $1 OR email = $2", body.Credential, body.Credential)
+	var user structs.User
+	row := db.QueryRow("SELECT * FROM users WHERE username = $1 OR email = $1", body.Credential)
 
-	if err := row.Scan(&user.Id, &user.Email, &user.Name); err == sql.ErrNoRows {
+	if err := row.Scan(&user.Id, &user.Name, &user.Email); err == sql.ErrNoRows {
 		w.Write([]byte("User not found!"))
 		return
 	} else if err != nil {
@@ -76,8 +92,14 @@ func connect(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+	err := validator.ValidateWithEmail(user)
+	if err != nil {
+		fmt.Println("error on email validation:", err)
+		errors.InternalServerError(w)
+		return
+	}
 
-	jsonRes, err := json.Marshal(user)
+	jsonRes, err := json.Marshal(ValidateRes{Email: user.Email})
 	if err != nil {
 		errors.InternalServerError(w)
 
