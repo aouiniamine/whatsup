@@ -11,10 +11,11 @@ const Connect = ({navigation}) =>{
     const register = ()=> navigation.navigate("Register")
     const logAccount = async() =>{
         try{
-            const res = await connect(credential)
-            console.log(res)
+            const result = await connect(credential)
+            // assuming result's format {email: '...'}
+            navigation.navigate("Validate", result)
             
-        }catch(err) { console.log('error: ', err); setError(err)}
+        }catch(err) { console.log('error: ', err); setError(err.message)}
         
     }
     return (

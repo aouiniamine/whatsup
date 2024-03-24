@@ -10,6 +10,7 @@ const Register = ({navigation}) =>{
     const [email, setEmail ] = useState("")
     const [error, setError] = useState('')
     const [username, setUsername] = useState('')
+    const login = () => navigation.navigate("Connect")
     const registerAccount = async() =>{
         try{
             const validEmail = validateEmail(email)
@@ -19,8 +20,8 @@ const Register = ({navigation}) =>{
                 const credential = {
                     email, username
                 }
-                const res = await register(credential)
-                console.log(res, credential)
+                const result = await register(credential)
+                navigation.navigate("Validate", result)
             } else{
                 
                 console.log("email is valid:", validEmail)
@@ -28,7 +29,7 @@ const Register = ({navigation}) =>{
                  
             }
 
-        }catch(err){ console.log(err); throw err}
+        }catch(err){ console.log(err); setError(err.message)}
         
     }
     return (
@@ -42,7 +43,7 @@ const Register = ({navigation}) =>{
                         <CustomInput placeholder={"Username"} onChange={setUsername}/>
                         <CustomButton text={"Connect"} onPress={registerAccount} style={{width: 250}}/>
                     </View>
-                    
+                    <Text onPress={login} style={style.login}>You already have an account?</Text>
                     {/* {error && <Text style={style.error} >{error}</Text>} */}
                 </View>
             
@@ -74,7 +75,7 @@ const style = StyleSheet.create({
         color: 'white',
         fontSize: 19
     },
-    register: {
+    login: {
         textAlign: "center",
         color: "grey",
         fontSize: 19

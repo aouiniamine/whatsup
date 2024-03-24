@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text } from "react-native";
 import { darkgreen, windowWidth } from "../../Styles/GlobalStyles";
 
-export default function CustomButton({text, onPress, style, textStyle}) {
+export default function CustomButton({text, onPress, style=null, textStyle=null}) {
     return (
         <Pressable onPress={onPress} style={[style1.button, style]}>
             <Text style={[style1.text, textStyle]}>{text}</Text>

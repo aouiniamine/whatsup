@@ -1,6 +1,8 @@
 import { FlatList } from "react-native"
 import NavBar from "../components/atoms/NavBar"
 import Message from "../components/Home/Message"
+import { useEffect } from "react"
+import { getToken } from "../utils/Repo/secureStorage"
 
 const Home = () =>{
 
@@ -9,6 +11,11 @@ const Home = () =>{
         {message: "Heyy I'd love tooo!!", name: "Diana Doe", image: ""}
     ]
 
+    useEffect(()=>{
+        (async()=>{
+            console.log(await getToken())
+        })()
+    })
     return (
         <>
             <NavBar></NavBar>

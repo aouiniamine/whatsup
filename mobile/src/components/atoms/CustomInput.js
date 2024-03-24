@@ -1,9 +1,9 @@
 import { StyleSheet, TextInput } from "react-native";
 import { darkgreen, windowWidth } from "../../Styles/GlobalStyles";
 
-export default function CustomInput ({value="", placeholder, onChange, style=null}) {
+export default function CustomInput ({value="", placeholder, onChange, style=null, type}) {
     return (
-        <TextInput placeholder={placeholder} defaultValue={value}
+        <TextInput placeholder={placeholder} defaultValue={value} keyboardType={type}
         style={[style1.input, style]} onChangeText={onChange}/>
     )
 }
