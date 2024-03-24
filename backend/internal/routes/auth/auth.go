@@ -11,6 +11,7 @@ import (
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/errors"
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/structs"
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/validator"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
 )
 
@@ -139,8 +140,18 @@ func validate(w http.ResponseWriter, r *http.Request) {
 		return
 
 	}
-	// fmt.Println(connectionReq.Id, connectionReq.Time)
 
-	w.Write([]byte("still in dev"))
+	claims := &jwt.RegisteredClaims{
+		ID: fmt.Sprintf("%d", connectionReq.Id),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
+
+	tokenString, err := token.SignedString(validator.SecretKey)
+	if err != nil {
+		errors.InternalServerError(w)
+		return
+	}
+	fmt.Println("token:", tokenString)
+	w.Write([]byte(tokenString))
 
 }

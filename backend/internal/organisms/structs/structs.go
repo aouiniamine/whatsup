@@ -1,5 +1,7 @@
 package structs
 
+import "time"
+
 // fix for cross import error
 type User struct {
 	Id    int    `db:"id"`
@@ -8,7 +10,6 @@ type User struct {
 }
 
 type ConnectionReq struct {
-	Id    int    `db:"id"`
-	Email string `db:"email" json:"email"`
-	Code  int    `db:"validator"`
+	Id   int       `db:"user_id"`
+	Time time.Time `db:"time"`
 }

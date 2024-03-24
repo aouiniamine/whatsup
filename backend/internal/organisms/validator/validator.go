@@ -76,3 +76,5 @@ func sendValidationEmail(receiver string, validationCode int) error {
 	fmt.Println("Email Sent Successfully!")
 	return nil
 }
+
+var SecretKey []byte = []byte("____________MY_Secret_Key____________")
