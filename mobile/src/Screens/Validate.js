@@ -16,8 +16,8 @@ const Validate = ({route, navigation}) =>{
                 email, code: Number(code)
             }
             console.log(body)
-            const res = await validate(body)
-            console.log(res)
+            await validate(body).then(navigation.navigate("Home"))
+            
         }catch(err) { console.log('error: ', err.message); setError(err.message)}
         
     }

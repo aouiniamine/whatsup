@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { SERVER } from './envirement'
+import { setToken } from './secureStorage'
 export const connect = (credential) =>
     axios.post(`${SERVER}/auth/connect`, {credential})
     .then(res => {
@@ -18,4 +19,4 @@ export const register = (credential) =>
 
 export const validate = (body) =>
     axios.post(`${SERVER}/auth/validate`, body)
-    .then(res => res.data)
+    .then(res => setToken(res.data))
