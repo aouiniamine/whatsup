@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/db"
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/errors"
@@ -18,8 +19,8 @@ type ConnectBody struct {
 }
 
 type ValidateReq struct {
-	Email string `json:"email"`
-	Code  int    `json:"code"`
+	Email string `json:"email" db:"email"`
+	Code  int    `json:"code" db:"validator"`
 }
 
 // type ValidteRes struct {
@@ -34,6 +35,7 @@ func AuthRouter() http.Handler {
 	r := mux.NewRouter()
 	r.HandleFunc("/auth/connect", connect).Methods("POST")
 	r.HandleFunc("/auth/register", register).Methods("POST")
+	r.HandleFunc("/auth/validate", validate).Methods("POST")
 	return r
 }
 
@@ -107,4 +109,38 @@ func connect(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write(jsonRes)
+}
+
+func validate(w http.ResponseWriter, r *http.Request) {
+	var body ValidateReq
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		errors.InternalServerError(w)
+		fmt.Println(err)
+		return
+	}
+	db := db.DBConnection
+	var connectionReq structs.ConnectionReq
+	err := db.QueryRow("SELECT connection_req.user_id, connection_req.req_time "+
+		"FROM connection_req INNER JOIN users ON users.id = connection_req.user_id "+
+		"WHERE users.email = $1 AND connection_req.validator = $2",
+		body.Email, body.Code).Scan(&connectionReq.Id, &connectionReq.Time)
+
+	if err != nil {
+		errors.InternalServerError(w)
+		fmt.Println(err)
+		return
+	}
+	timeNow := time.Now()
+	experationDate := connectionReq.Time.Add(2 * time.Hour)
+	fmt.Println("is expired: ", experationDate.Before(timeNow))
+	sessionHasExpired := experationDate.Before(timeNow)
+	if sessionHasExpired {
+		errors.SessionHasExpired(w)
+		return
+
+	}
+	// fmt.Println(connectionReq.Id, connectionReq.Time)
+
+	w.Write([]byte("still in dev"))
+
 }

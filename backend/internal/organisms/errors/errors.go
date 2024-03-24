@@ -11,3 +11,8 @@ func UserAlreadyExist(w http.ResponseWriter, errorMsg error) {
 	w.WriteHeader(http.StatusConflict)
 	w.Write([]byte("User already exists: 409"))
 }
+
+func SessionHasExpired(w http.ResponseWriter) {
+	w.WriteHeader(440)
+	w.Write([]byte("Session Has Expired!"))
+}
