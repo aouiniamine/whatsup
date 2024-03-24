@@ -10,4 +10,12 @@ export const connect = (credential) =>
 
 export const register = (credential) =>
     axios.post(`${SERVER}/auth/register`, credential)
+    .then(res => {
+        if (res.data?.email){
+            return res.data
+        } else throw res.data
+    })
+
+export const validate = (body) =>
+    axios.post(`${SERVER}/auth/validate`, body)
     .then(res => res.data)
