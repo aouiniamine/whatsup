@@ -12,7 +12,6 @@ import (
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/structs"
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/validator"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/gorilla/mux"
 )
 
 type ConnectBody struct {
@@ -32,15 +31,7 @@ type ValidateRes struct {
 	Email string `json:"email"`
 }
 
-func AuthRouter() http.Handler {
-	r := mux.NewRouter()
-	r.HandleFunc("/auth/connect", connect).Methods("POST")
-	r.HandleFunc("/auth/register", register).Methods("POST")
-	r.HandleFunc("/auth/validate", validate).Methods("POST")
-	return r
-}
-
-func register(w http.ResponseWriter, r *http.Request) {
+func Register(w http.ResponseWriter, r *http.Request) {
 	var body structs.User
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		errors.InternalServerError(w)
@@ -74,7 +65,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func connect(w http.ResponseWriter, r *http.Request) {
+func Connect(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("request has came!!")
 	var body ConnectBody
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
@@ -112,7 +103,7 @@ func connect(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonRes)
 }
 
-func validate(w http.ResponseWriter, r *http.Request) {
+func Validate(w http.ResponseWriter, r *http.Request) {
 	var body ValidateReq
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		errors.InternalServerError(w)
