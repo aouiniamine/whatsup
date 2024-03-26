@@ -1,9 +1,10 @@
 import { KeyboardAvoidingView, Platform, StyleSheet, View, Text } from "react-native"
 import CustomInput from "../components/atoms/CustomInput"
 import { darkgreen, lightgreen, windowWidth } from "../Styles/GlobalStyles"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import CustomButton from "../components/atoms/CustomButton"
 import { connect } from "../utils/Repo/Auth"
+import { getToken } from "../utils/Repo/secureStorage"
 
 const Connect = ({navigation}) =>{
     const [credential, setCredential ] = useState("")
@@ -18,6 +19,12 @@ const Connect = ({navigation}) =>{
         }catch(err) { console.log('error: ', err); setError(err.message)}
         
     }
+
+    useEffect(()=> {
+        if (getToken()){
+            navigation.navigate("Home")
+        }
+    }, [])
     return (
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={style.wrapper}>
