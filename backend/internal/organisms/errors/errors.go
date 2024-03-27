@@ -16,3 +16,8 @@ func SessionHasExpired(w http.ResponseWriter) {
 	w.WriteHeader(440)
 	w.Write([]byte("Session Has Expired!"))
 }
+
+func Unauthorized(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusUnauthorized)
+	w.Write([]byte("User is unauthorized!"))
+}
