@@ -31,6 +31,11 @@ type ValidateRes struct {
 	Email string `json:"email"`
 }
 
+type GetUserRes struct {
+	Email string `json:"email"`
+	Name  string `json:"username"`
+}
+
 func Register(w http.ResponseWriter, r *http.Request) {
 	var body structs.User
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
@@ -145,7 +150,7 @@ func Validate(w http.ResponseWriter, r *http.Request) {
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	userId := r.Header.Get("UserId")
 	fmt.Println(userId)
-	user := structs.User{}
+	user := GetUserRes{}
 	db := db.DBConnection
 	if err := db.QueryRow("SELECT username, email FROM users WHERE id = $1",
 		userId).Scan(&user.Name, &user.Email); err != nil {
@@ -156,6 +161,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		errors.InternalServerError(w)
 		return
 	}
+	w.WriteHeader(http.StatusOK)
 	w.Write(jsonRes)
 
 }

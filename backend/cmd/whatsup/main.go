@@ -17,10 +17,10 @@ func main() {
 	user.HandleFunc("/connect", auth.Connect).Methods("POST")
 	user.HandleFunc("/register", auth.Register).Methods("POST")
 	user.HandleFunc("/validate", auth.Validate).Methods("POST")
-	user.HandleFunc("/getuser", middlewares.Authorize(auth.GetUser)).Methods("GET")
+	user.HandleFunc("/get", middlewares.Authorize(auth.GetUser)).Methods("GET")
 
 	// WebSocket
-	router.HandleFunc("/ws", ws.OnConnect)
+	router.HandleFunc("/ws/{username}", ws.OnConnect)
 
 	port := 8080
 	addr := fmt.Sprintf("192.168.0.14:%d", port)
