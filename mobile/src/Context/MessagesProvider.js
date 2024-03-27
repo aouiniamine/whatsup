@@ -1,15 +1,23 @@
-import {createContext, useEffect} from "react"
-import { socket } from "../utils/Repo/socket"
+import {createContext, useContext, useEffect, useRef} from "react"
+import { UserContext } from "./UserProvider"
+import { SERVER } from "../utils/Repo/envirement"
+// import { socket } from "../utils/Repo/socket"
 const MessagesContext = createContext()
 
 export default function MessagesProvider ({ children }){
-
+    const {username} = useContext(UserContext)
+    const WSRef = useRef(null)
     useEffect(()=>{
-        socket.onopen = () =>console.log("user is connected")
-        socket.onclose = (e) => console.log("user is diconnected:", e)
-        socket.onerror = (err) => console.log("ws error", err)
-    }   , [])
+        if (username){
+            console.log("user ready for messages")
+            let ws =  new WebSocket(`${SERVER}/ws/${username}`)
+            ws.onopen = () =>console.log("user is connected")
+            ws.onclose = (e) => console.log("user is diconnected:", e)
+            ws.onerror = (err) => console.log("ws error", err)
+            WSRef.current = ws
 
+        }
+    }   , [username])    
     return (
         <MessagesContext.Provider value={{}}>
             {children}

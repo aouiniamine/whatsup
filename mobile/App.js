@@ -8,11 +8,13 @@ import Connect from './src/Screens/Connect';
 import Register from './src/Screens/Register';
 import Validate from './src/Screens/Validate';
 import MessagesProvider from './src/Context/MessagesProvider';
+import UserProvider from './src/Context/UserProvider';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
+    <UserProvider>
     <MessagesProvider>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{headerShown: false}} initialRouteName='Connect'>
@@ -23,6 +25,7 @@ export default function App() {
         </Stack.Navigator>
       </NavigationContainer>
     </MessagesProvider>
+    </UserProvider>
   );
 }
 
