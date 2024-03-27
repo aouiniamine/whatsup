@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/aouiniamine/whatsup/backend/internal/routes/auth"
+	"github.com/aouiniamine/whatsup/backend/internal/routes/middlewares"
 	"github.com/aouiniamine/whatsup/backend/internal/ws"
 	"github.com/gorilla/mux"
 )
@@ -16,6 +17,7 @@ func main() {
 	user.HandleFunc("/connect", auth.Connect).Methods("POST")
 	user.HandleFunc("/register", auth.Register).Methods("POST")
 	user.HandleFunc("/validate", auth.Validate).Methods("POST")
+	user.HandleFunc("/getuser", middlewares.Authorize(auth.GetUser)).Methods("GET")
 
 	// WebSocket
 	router.HandleFunc("/ws", ws.OnConnect)

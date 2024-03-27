@@ -11,7 +11,7 @@ import (
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/errors"
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/structs"
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/validator"
-	"github.com/golang-jwt/jwt/v5"
+	"github.com/aouiniamine/whatsup/backend/internal/routes/middlewares"
 )
 
 type ConnectBody struct {
@@ -132,17 +132,30 @@ func Validate(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	claims := &jwt.RegisteredClaims{
-		ID: fmt.Sprintf("%d", connectionReq.Id),
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
-
-	tokenString, err := token.SignedString(validator.SecretKey)
+	token, err := middlewares.CreateToken(connectionReq.Id)
 	if err != nil {
 		errors.InternalServerError(w)
 		return
 	}
-	fmt.Println("token:", tokenString)
-	w.Write([]byte(tokenString))
+	fmt.Println("token:", token)
+	w.Write([]byte(token))
+
+}
+
+func GetUser(w http.ResponseWriter, r *http.Request) {
+	userId := r.Header.Get("UserId")
+	fmt.Println(userId)
+	user := structs.User{}
+	db := db.DBConnection
+	if err := db.QueryRow("SELECT username, email FROM users WHERE id = $1",
+		userId).Scan(&user.Name, &user.Email); err != nil {
+		errors.InternalServerError(w)
+	}
+	jsonRes, err := json.Marshal(user)
+	if err != nil {
+		errors.InternalServerError(w)
+		return
+	}
+	w.Write(jsonRes)
 
 }
