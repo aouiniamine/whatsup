@@ -4,7 +4,7 @@ import { darkgreen, lightgreen, windowWidth } from "../Styles/GlobalStyles"
 import { useEffect, useState } from "react"
 import CustomButton from "../components/atoms/CustomButton"
 import { connect } from "../utils/Repo/Auth"
-import { getToken } from "../utils/Repo/secureStorage"
+import { getToken, removeToken } from "../utils/Repo/secureStorage"
 
 const Connect = ({navigation}) =>{
     const [credential, setCredential ] = useState("")
@@ -21,10 +21,13 @@ const Connect = ({navigation}) =>{
     }
 
     useEffect(()=> {
-        if (getToken()){
-            navigation.navigate("Home")
-        }
-    }, [])
+        (async()=>{
+
+            if (await getToken()){
+                navigation.navigate("Home")
+            }
+        })()
+        }, [])
     return (
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={style.wrapper}>
