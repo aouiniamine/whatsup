@@ -8,7 +8,7 @@ import (
 	"net/smtp"
 
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/db"
-	"github.com/aouiniamine/whatsup/backend/internal/organisms/structs"
+	"github.com/aouiniamine/whatsup/backend/internal/repositories/user"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -25,7 +25,7 @@ func randRangeCrypto() (int64, error) {
 	return n.Int64() + min, nil
 }
 
-func ValidateWithEmail(user structs.User) error {
+func ValidateWithEmail(user user.User) error {
 	generatedInt, err := randRangeCrypto()
 	if err != nil {
 		return err

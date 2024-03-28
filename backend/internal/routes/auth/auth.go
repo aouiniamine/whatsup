@@ -1,16 +1,17 @@
 package auth
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/db"
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/errors"
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/structs"
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/validator"
+	"github.com/aouiniamine/whatsup/backend/internal/repositories/user"
 )
 
 type ConnectBody struct {
@@ -22,38 +23,29 @@ type ValidateReq struct {
 	Code  int    `json:"code" db:"validator"`
 }
 
-// type ValidteRes struct {
-// 	Token string `json: token`
-// }
-
 type ValidateRes struct {
 	Email string `json:"email"`
 }
 
-type GetUserRes struct {
+type User struct {
 	Email string `json:"email"`
 	Name  string `json:"username"`
 }
 
 func Register(w http.ResponseWriter, r *http.Request) {
-	var body structs.User
+	var body User
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		errors.InternalServerError(w)
 
 		return
 	}
-	db := db.DBConnection
-
-	if err := db.QueryRow(
-		"INSERT INTO users (email, username) VALUES ($1, $2) RETURNING id",
-		body.Email, body.Name).Scan(&body.Id); err != nil {
-		fmt.Println("database error on register", err.Error())
+	user, err := user.AddUser(body.Email, body.Name)
+	if err != nil {
 		errors.UserAlreadyExist(w, err)
 		return
 	}
 	fmt.Println("user is created")
-	err := validator.ValidateWithEmail(body)
-	if err != nil {
+	if err := validator.ValidateWithEmail(user); err != nil {
 		fmt.Println("error on email validation:", err)
 		errors.InternalServerError(w)
 		return
@@ -77,21 +69,13 @@ func Connect(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-	db := db.DBConnection
-	var user structs.User
-	row := db.QueryRow("SELECT * FROM users WHERE username = $1 OR email = $1", body.Credential)
-
-	if err := row.Scan(&user.Id, &user.Name, &user.Email); err == sql.ErrNoRows {
-		w.Write([]byte("User not found!"))
-		return
-	} else if err != nil {
-		fmt.Println(err)
+	user, err := user.GetByCredential(body.Credential)
+	if err != nil {
 		errors.InternalServerError(w)
-
+		fmt.Println(err)
 		return
 	}
-	err := validator.ValidateWithEmail(user)
-	if err != nil {
+	if err := validator.ValidateWithEmail(user); err != nil {
 		fmt.Println("error on email validation:", err)
 		errors.InternalServerError(w)
 		return
@@ -147,15 +131,20 @@ func Validate(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
-	userId := r.Header.Get("UserId")
-	fmt.Println(userId)
-	user := GetUserRes{}
-	db := db.DBConnection
-	if err := db.QueryRow("SELECT username, email FROM users WHERE id = $1",
-		userId).Scan(&user.Name, &user.Email); err != nil {
+	id := r.Header.Get("UserId")
+	userId, err := strconv.Atoi(id)
+	if err != nil {
 		errors.InternalServerError(w)
+		return
 	}
-	jsonRes, err := json.Marshal(user)
+	user, err := user.GetById(userId)
+	if err != nil {
+		errors.InternalServerError(w)
+		return
+	}
+
+	userRes := User{Name: user.Name, Email: user.Email}
+	jsonRes, err := json.Marshal(userRes)
 	if err != nil {
 		errors.InternalServerError(w)
 		return
