@@ -20,7 +20,7 @@ func main() {
 	user.HandleFunc("/get", middlewares.Authorize(auth.GetUser)).Methods("GET")
 
 	// WebSocket
-	router.HandleFunc("/ws/{username}", ws.OnConnect)
+	router.HandleFunc("/ws/{username}", ws.ValidateWS(ws.OnConnect))
 
 	port := 8080
 	addr := fmt.Sprintf("192.168.0.14:%d", port)

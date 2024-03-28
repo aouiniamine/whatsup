@@ -2,7 +2,6 @@ import {createContext, useState, useEffect, useRef} from "react"
 import { SERVER } from "../utils/Repo/envirement"
 import { getToken } from "../utils/Repo/secureStorage"
 import { getUser } from "../utils/Repo/Auth"
-
 // import { socket } from "../utils/Repo/socket"
 export const MessagesContext = createContext()
 
@@ -21,7 +20,7 @@ export default function MessagesProvider ({ children }){
                     
                     setUsername(currentUser.username)
                     setToken(tokenFound)
-                    let ws =  new WebSocket(`${SERVER}/ws/${username}`)
+                    let ws =  new WebSocket(`${SERVER}/ws/${currentUser.username}?token=${tokenFound}`,)
                     ws.onopen = () =>console.log("user is connected")
                     ws.onclose = (e) => console.log("user is diconnected:", e)
                     ws.onerror = (err) => console.log("ws error", err)
@@ -29,6 +28,8 @@ export default function MessagesProvider ({ children }){
                 } catch (err){
                     console.log(err)
                 }
+            } else {
+                console.log("user not logged")
             }
         })()
         
