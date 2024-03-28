@@ -1,22 +1,26 @@
 import { KeyboardAvoidingView, Platform, StyleSheet, View, Text } from "react-native"
 import CustomInput from "../components/atoms/CustomInput"
 import { darkgreen, lightgreen, lightgrey, windowWidth } from "../Styles/GlobalStyles"
-import { useState } from "react"
+import { useContext, useState } from "react"
 import CustomButton from "../components/atoms/CustomButton"
 import { validate } from "../utils/Repo/Auth"
+import { MessagesContext } from "../Context/MessagesProvider"
 
 const Validate = ({route, navigation}) =>{
     const {email} = route.params;
     const [code, setCode ] = useState("")
     const [error, setError] = useState('')
     const login = ()=> navigation.navigate("Register")
+    const {setToken} = useContext(MessagesContext)
     const onValidate = async() =>{
         try{
             const body ={
                 email, code: Number(code)
             }
             console.log(body)
-            await validate(body).then(navigation.navigate("Home"))
+            const token = await validate(body)
+            setToken(token)
+            navigation.navigate("Home")
             
         }catch(err) { console.log('error: ', err.message); setError(err.message)}
         

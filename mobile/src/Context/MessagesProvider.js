@@ -1,25 +1,42 @@
-import {createContext, useContext, useEffect, useRef} from "react"
-import { UserContext } from "./UserProvider"
+import {createContext, useState, useEffect, useRef} from "react"
 import { SERVER } from "../utils/Repo/envirement"
+import { getToken } from "../utils/Repo/secureStorage"
+import { getUser } from "../utils/Repo/Auth"
+
 // import { socket } from "../utils/Repo/socket"
-const MessagesContext = createContext()
+export const MessagesContext = createContext()
 
 export default function MessagesProvider ({ children }){
-    const {username} = useContext(UserContext)
+    const [token, setToken ] = useState(null)
+    const [username, setUsername] = useState(null)
     const WSRef = useRef(null)
     useEffect(()=>{
-        if (username){
-            console.log("user ready for messages")
-            let ws =  new WebSocket(`${SERVER}/ws/${username}`)
-            ws.onopen = () =>console.log("user is connected")
-            ws.onclose = (e) => console.log("user is diconnected:", e)
-            ws.onerror = (err) => console.log("ws error", err)
-            WSRef.current = ws
 
-        }
-    }   , [username])    
+        (async()=>{
+            const tokenFound = token || await getToken()
+            if (tokenFound){
+                try{
+
+                    const currentUser = await getUser(tokenFound)
+                    
+                    setUsername(currentUser.username)
+                    setToken(tokenFound)
+                    let ws =  new WebSocket(`${SERVER}/ws/${username}`)
+                    ws.onopen = () =>console.log("user is connected")
+                    ws.onclose = (e) => console.log("user is diconnected:", e)
+                    ws.onerror = (err) => console.log("ws error", err)
+                    WSRef.current = ws
+                } catch (err){
+                    console.log(err)
+                }
+            }
+        })()
+        
+
+        
+    }   , [token])    
     return (
-        <MessagesContext.Provider value={{}}>
+        <MessagesContext.Provider value={{setToken}}>
             {children}
         </MessagesContext.Provider>
     )

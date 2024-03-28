@@ -10,7 +10,7 @@ const Home = () =>{
         {message: "Heyyyyy!ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", name: "Jhon Doe", image: ""}, 
         {message: "Heyy I'd love tooo!!", name: "Diana Doe", image: ""}
     ]
-    
+    // useEffect(()=>{removeToken()}, [])
     return (
         <>
             <NavBar></NavBar>
