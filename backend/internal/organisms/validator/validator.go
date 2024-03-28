@@ -2,12 +2,14 @@ package validator
 
 import (
 	"crypto/rand"
+	"errors"
 	"fmt"
 	"math/big"
 	"net/smtp"
 
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/db"
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/structs"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func randRangeCrypto() (int64, error) {
@@ -77,4 +79,36 @@ func sendValidationEmail(receiver string, validationCode int) error {
 	return nil
 }
 
-var SecretKey []byte = []byte("____________MY_Secret_Key____________")
+var secretKey []byte = []byte("____________MY_Secret_Key____________")
+
+func VerifyToken(tokenString string) (string, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return secretKey, nil
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		id, ok := claims["id"].(string)
+		if !ok {
+			fmt.Println()
+			return "", errors.New("ID claim not found in JWT")
+		}
+		return id, nil
+
+	} else {
+		return "", errors.New("token is invalid")
+	}
+}
+
+func CreateToken(id int) (string, error) {
+	claims := &jwt.MapClaims{
+		"id": fmt.Sprintf("%d", id),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
+
+	tokenString, err := token.SignedString(secretKey)
+	return tokenString, err
+}

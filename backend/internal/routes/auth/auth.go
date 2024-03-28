@@ -11,7 +11,6 @@ import (
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/errors"
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/structs"
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/validator"
-	"github.com/aouiniamine/whatsup/backend/internal/routes/middlewares"
 )
 
 type ConnectBody struct {
@@ -137,7 +136,7 @@ func Validate(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	token, err := middlewares.CreateToken(connectionReq.Id)
+	token, err := validator.CreateToken(connectionReq.Id)
 	if err != nil {
 		errors.InternalServerError(w)
 		return
