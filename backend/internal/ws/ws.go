@@ -24,14 +24,41 @@ var upgrader = websocket.Upgrader{
 
 // var connMap = make(map[string]connection)
 
+func handleWS(username, userId string, conn *websocket.Conn) {
+
+	AddConn(username, userId, *conn)
+
+	for {
+		messageType, message, err := conn.ReadMessage()
+		if err != nil {
+			if messageType != websocket.CloseMessage {
+				log.Println("Error reading message:", err)
+			}
+			break // Disconnect or other error
+		}
+
+		if messageType == websocket.CloseMessage {
+			log.Println("Client disconnected")
+			break // Client closed the connection
+		}
+		log.Println(message)
+	}
+	RmConn(username)
+	conn.Close()
+
+}
+
 func OnConnect(w http.ResponseWriter, r *http.Request) {
 	username := mux.Vars(r)["username"]
 	userId := r.Header.Get("UserId")
 
-	_, err := upgrader.Upgrade(w, r, nil)
+	conn, err := upgrader.Upgrade(w, r, nil)
 	if (err) != nil {
-		panic(err)
+		errors.InternalServerError(w)
+		return
 	}
+
+	go handleWS(username, userId, conn)
 	// connMap[username] = connection{Id: userId, Conn: conn}
 	log.Print("user: ", username, ", id:", userId, " is connected")
 }

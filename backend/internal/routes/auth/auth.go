@@ -9,8 +9,8 @@ import (
 
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/db"
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/errors"
-	"github.com/aouiniamine/whatsup/backend/internal/organisms/structs"
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/validator"
+	"github.com/aouiniamine/whatsup/backend/internal/repositories/connections"
 	"github.com/aouiniamine/whatsup/backend/internal/repositories/user"
 )
 
@@ -99,7 +99,7 @@ func Validate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	db := db.DBConnection
-	var connectionReq structs.ConnectionReq
+	var connectionReq connections.ConnectionReq
 	err := db.QueryRow("SELECT connection_req.user_id, connection_req.req_time "+
 		"FROM connection_req INNER JOIN users ON users.id = connection_req.user_id "+
 		"WHERE users.email = $1 AND connection_req.validator = $2",
