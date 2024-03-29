@@ -1,4 +1,4 @@
-package ws
+package connStore
 
 import (
 	"sync"
@@ -11,15 +11,21 @@ type WSConn struct {
 	Conn websocket.Conn
 }
 
-// var connectedUsers = map[string]WSConn
+var connectedUsers = make(map[string]WSConn)
 
 var AllConns sync.Map
 
 func AddConn(username string, userId string, conn websocket.Conn) {
-	AllConns.Store(username, WSConn{Id: userId, Conn: conn})
+	// AllConns.Store(username, WSConn{Id: userId, Conn: conn})
+	connectedUsers[username] = WSConn{Id: userId, Conn: conn}
 
 }
 
 func RmConn(username string) {
-	AllConns.Delete(username)
+	delete(connectedUsers, username)
+}
+
+func GetConn(username string) (WSConn, bool) {
+	wsConn, ok := connectedUsers[username]
+	return wsConn, ok
 }

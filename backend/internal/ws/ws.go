@@ -8,6 +8,7 @@ import (
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/db"
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/errors"
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/validator"
+	"github.com/aouiniamine/whatsup/backend/internal/ws/connStore"
 	"github.com/aouiniamine/whatsup/backend/internal/ws/messages"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
@@ -27,7 +28,7 @@ var upgrader = websocket.Upgrader{
 
 func handleWS(username, userId string, conn *websocket.Conn) {
 
-	AddConn(username, userId, *conn)
+	connStore.AddConn(username, userId, *conn)
 
 	for {
 		messageType, message, err := conn.ReadMessage()
@@ -42,9 +43,9 @@ func handleWS(username, userId string, conn *websocket.Conn) {
 			log.Println("Client disconnected")
 			break // Client closed the connection
 		}
-		messages.HandleMessages(username, userId, message, *conn)
+		messages.HandleMessages(username, userId, message, conn)
 	}
-	RmConn(username)
+	connStore.RmConn(username)
 	conn.Close()
 
 }

@@ -44,7 +44,7 @@ func GetByCredential(credential string) (User, error) {
 	row := db.QueryRow("SELECT * FROM users WHERE username = $1 OR email = $1", credential)
 
 	if err := row.Scan(&user.Id, &user.Name, &user.Email); err == sql.ErrNoRows {
-		// w.Write()
+
 		return user, errors.New("User not found")
 	} else if err != nil {
 		return user, err
