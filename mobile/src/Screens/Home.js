@@ -1,20 +1,29 @@
 import { FlatList, StyleSheet, TouchableOpacity, } from "react-native"
 import NavBar from "../components/atoms/NavBar"
 import Message from "../components/Home/Message"
-import { useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { FontAwesome } from '@expo/vector-icons';
 import { darkgreen, lightgreen } from "../Styles/GlobalStyles"
 import SendMessage from "../components/atoms/SendMessage"
+import { MessagesContext } from "../Context/MessagesProvider";
 
 const Home = ({navigation}) =>{
     const [sendingMesssage, setSendingMessage] = useState(false)
     const closeForm = ()=> setSendingMessage(false)
     const openForm = ()=>setSendingMessage(true)
+    const {chats} = useContext(MessagesContext)
     const dummyChats = [
         {message: "Heyyyyy!ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", name: "Jhon Doe", image: ""}, 
         {message: "Heyy I'd love tooo!!", name: "Diana Doe", image: ""}
     ]
     // useEffect(()=>{removeToken(); navigation.navigate("Connect")}, [])
+    const renderChat = ({item, i}) =>{
+        const lastMessage = item[item.length-1]
+        console.log(lastMessage)
+        return <Message key={i} name={lastMessage.username} message={lastMessage.message}/>
+    }
+
+    // useEffect(()=>{console.log(chats)}, [chats])
     return (
         <>
 
@@ -24,8 +33,7 @@ const Home = ({navigation}) =>{
 
             </TouchableOpacity>
             {sendingMesssage && <SendMessage isVisible={sendingMesssage} closeForm={closeForm}/>}
-            <FlatList data={dummyChats}
-            renderItem={({item, i}) => <Message key={i} name={item.name} message={item.message}/>}/>
+            <FlatList data={chats} renderItem={renderChat}/>
         </>
     )
 }

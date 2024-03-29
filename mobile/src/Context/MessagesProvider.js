@@ -7,8 +7,29 @@ export const MessagesContext = createContext()
 
 export default function MessagesProvider ({ children }){
     const [token, setToken ] = useState(null)
+    const [username, setUsername] = useState(null)
     const WSRef = useRef(null)
     const [isOpen, setIsOpen] = useState(false)
+    const [chats, setChats] = useState([])
+
+    const recieveMessage = (message, chats) =>{
+        for (let i in chats){
+            let conv = chats[i]
+            for(let j in conv){
+                const convMessage = conv[j]
+                if (convMessage.username === message.username){
+                    chats[i].push(message)
+                    return chats
+                }
+                if (convMessage.username !== username || convMessage.username !== message.username){
+                    break
+                }
+            }
+        }
+        chats.push([message])
+        return chats
+        
+    }
 
     const sendMessage = (username, message) =>{
         if (isOpen){
@@ -23,7 +44,7 @@ export default function MessagesProvider ({ children }){
                 try{
 
                     const currentUser = await getUser(tokenFound)
-                    
+                    setUsername(currentUser.username)
                     setToken(tokenFound)
                     let ws =  new WebSocket(`${SERVER}/ws/${currentUser.username}?token=${tokenFound}`,)
                     ws.onopen = () =>{
@@ -36,6 +57,21 @@ export default function MessagesProvider ({ children }){
                         
                     } 
                     ws.onerror = (err) => console.log("ws error", err)
+                    ws.onmessage = (event) =>{
+                        const messageData = JSON.parse(event.data)
+                        switch(messageData.type){
+                            case "message:recieve":
+                                const {username, message} = messageData
+                                const updatedChats = recieveMessage({username, message}, chats)
+                                console.log("message from", username, "is recieved")
+                                console.log(updatedChats)
+                                setChats(updatedChats)
+                                break;
+                            default:
+                                console.log("Still working on it!")
+                        }
+                        
+                    }
                     ws.addEventListener('recieve:message', (e)=> console.log("revieved message: ", e.data))
                     
                     WSRef.current = ws
@@ -51,7 +87,7 @@ export default function MessagesProvider ({ children }){
         
     }   , [token])
     return (
-        <MessagesContext.Provider value={{setToken, sendMessage}}>
+        <MessagesContext.Provider value={{setToken, sendMessage, chats}}>
             {children}
         </MessagesContext.Provider>
     )

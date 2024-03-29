@@ -2,7 +2,7 @@ import { StyleSheet, View, Text } from "react-native"
 import { Avatar } from 'react-native-elements';
 import { nameStyle, windowWidth } from "../../Styles/GlobalStyles";
 import { useEffect, useState } from "react";
-const Message = ({message, name, image, }) =>{
+const Message = ({message, name, image, key}) =>{
     const [showMessage, setShowMessage] = useState(message)
     useEffect(()=>{
         if (message.length > 27){
@@ -11,7 +11,7 @@ const Message = ({message, name, image, }) =>{
         }
     }, [])
     return (
-        <View style={style.container}>
+        <View style={style.container} key={key}>
             <Avatar
                 rounded
                 size={70}
