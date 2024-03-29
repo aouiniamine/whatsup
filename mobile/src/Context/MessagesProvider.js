@@ -11,7 +11,6 @@ export default function MessagesProvider ({ children }){
     const [isOpen, setIsOpen] = useState(false)
 
     const sendMessage = (username, message) =>{
-        console.log(username, message)
         if (isOpen){
             WSRef.current.send(JSON.stringify({username, message}))
         }

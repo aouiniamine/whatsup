@@ -1,23 +1,49 @@
-import { FlatList } from "react-native"
+import { FlatList, StyleSheet, TouchableOpacity, } from "react-native"
 import NavBar from "../components/atoms/NavBar"
 import Message from "../components/Home/Message"
-import { useEffect } from "react"
-import { getToken, removeToken } from "../utils/Repo/secureStorage"
+import { useState } from "react"
+import { FontAwesome } from '@expo/vector-icons';
+import { darkgreen, lightgreen } from "../Styles/GlobalStyles"
+import SendMessage from "../components/atoms/SendMessage"
 
-const Home = () =>{
-
+const Home = ({navigation}) =>{
+    const [sendingMesssage, setSendingMessage] = useState(false)
+    const closeForm = ()=> setSendingMessage(false)
+    const openForm = ()=>setSendingMessage(true)
     const dummyChats = [
         {message: "Heyyyyy!ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", name: "Jhon Doe", image: ""}, 
         {message: "Heyy I'd love tooo!!", name: "Diana Doe", image: ""}
     ]
-    // useEffect(()=>{removeToken()}, [])
+    // useEffect(()=>{removeToken(); navigation.navigate("Connect")}, [])
     return (
         <>
+
             <NavBar></NavBar>
+            <TouchableOpacity style={[style.addContainer, sendingMesssage ? {backgroundColor: lightgreen}: null]} onPress={openForm}>
+                <FontAwesome name="plus" size={40} color={"white"} />
+
+            </TouchableOpacity>
+            {sendingMesssage && <SendMessage isVisible={sendingMesssage} closeForm={closeForm}/>}
             <FlatList data={dummyChats}
             renderItem={({item, i}) => <Message key={i} name={item.name} message={item.message}/>}/>
         </>
     )
 }
 
+const style = StyleSheet.create({
+    addContainer: {
+        backgroundColor: darkgreen,
+        flex: 1,
+        width: 60,
+        maxHeight: 60,
+        minHeight: 60,
+        borderRadius: 100,
+        position: "absolute",
+        bottom: 50,
+        right: 50,
+        alignItems: 'center',
+        justifyContent: "center",
+        zIndex: 200
+    }
+})
 export default Home
