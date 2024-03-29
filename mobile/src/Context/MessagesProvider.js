@@ -7,8 +7,15 @@ export const MessagesContext = createContext()
 
 export default function MessagesProvider ({ children }){
     const [token, setToken ] = useState(null)
-    const [username, setUsername] = useState(null)
     const WSRef = useRef(null)
+    const [isOpen, setIsOpen] = useState(false)
+
+    const sendMessage = (username, message) =>{
+        console.log(username, message)
+        if (isOpen){
+            WSRef.current.send(JSON.stringify({username, message}))
+        }
+    }
     useEffect(()=>{
 
         (async()=>{
@@ -18,12 +25,20 @@ export default function MessagesProvider ({ children }){
 
                     const currentUser = await getUser(tokenFound)
                     
-                    setUsername(currentUser.username)
                     setToken(tokenFound)
                     let ws =  new WebSocket(`${SERVER}/ws/${currentUser.username}?token=${tokenFound}`,)
-                    ws.onopen = () =>console.log("user is connected")
-                    ws.onclose = (e) => console.log("user is diconnected:", e)
+                    ws.onopen = () =>{
+                        setIsOpen(true)
+                        console.log("user is connected")
+                    }
+                    ws.onclose = (e) => {
+                        setIsOpen(false)
+                        console.log("user is diconnected:", e)
+                        
+                    } 
                     ws.onerror = (err) => console.log("ws error", err)
+                    ws.addEventListener('recieve:message', (e)=> console.log("revieved message: ", e.data))
+                    
                     WSRef.current = ws
                 } catch (err){
                     console.log(err)
@@ -35,9 +50,9 @@ export default function MessagesProvider ({ children }){
         
 
         
-    }   , [token])    
+    }   , [token])
     return (
-        <MessagesContext.Provider value={{setToken}}>
+        <MessagesContext.Provider value={{setToken, sendMessage}}>
             {children}
         </MessagesContext.Provider>
     )

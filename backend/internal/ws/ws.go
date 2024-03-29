@@ -8,6 +8,7 @@ import (
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/db"
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/errors"
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/validator"
+	"github.com/aouiniamine/whatsup/backend/internal/ws/messages"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 )
@@ -41,7 +42,7 @@ func handleWS(username, userId string, conn *websocket.Conn) {
 			log.Println("Client disconnected")
 			break // Client closed the connection
 		}
-		log.Println(message)
+		messages.HandleMessages(username, userId, message, *conn)
 	}
 	RmConn(username)
 	conn.Close()
