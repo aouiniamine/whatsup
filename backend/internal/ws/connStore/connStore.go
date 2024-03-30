@@ -7,7 +7,7 @@ import (
 )
 
 type WSConn struct {
-	Id   string
+	Id   int
 	Conn websocket.Conn
 }
 
@@ -15,7 +15,7 @@ var connectedUsers = make(map[string]WSConn)
 
 var AllConns sync.Map
 
-func AddConn(username string, userId string, conn websocket.Conn) {
+func AddConn(username string, userId int, conn websocket.Conn) {
 	// AllConns.Store(username, WSConn{Id: userId, Conn: conn})
 	connectedUsers[username] = WSConn{Id: userId, Conn: conn}
 

@@ -6,7 +6,7 @@ import (
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/db"
 )
 
-func CreateMessage(from, to, message string) error {
+func CreateMessage(from, to int, message string) error {
 	db := db.DBConnection
 	var id int
 	if err := db.QueryRow(

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/db"
 	"github.com/aouiniamine/whatsup/backend/internal/organisms/errors"
@@ -26,7 +27,7 @@ var upgrader = websocket.Upgrader{
 
 // var connMap = make(map[string]connection)
 
-func handleWS(username, userId string, conn *websocket.Conn) {
+func handleWS(username string, userId int, conn *websocket.Conn) {
 
 	connStore.AddConn(username, userId, *conn)
 
@@ -59,8 +60,9 @@ func OnConnect(w http.ResponseWriter, r *http.Request) {
 		errors.InternalServerError(w)
 		return
 	}
+	parsedUserId, _ := strconv.Atoi(userId)
 
-	go handleWS(username, userId, conn)
+	go handleWS(username, parsedUserId, conn)
 	// connMap[username] = connection{Id: userId, Conn: conn}
 	log.Print("user: ", username, ", id:", userId, " is connected")
 }

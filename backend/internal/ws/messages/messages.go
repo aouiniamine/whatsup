@@ -23,13 +23,13 @@ type SendMessage struct {
 	Type    string `json:"type"`
 }
 
-func HandleMessages(username, userId string, messageByte []byte, conn *websocket.Conn) {
+func HandleMessages(username string, userId int, messageByte []byte, conn *websocket.Conn) {
 	var message UserMessage
 	if err := json.Unmarshal(messageByte, &message); err != nil {
 
 		return
 	}
-	var to string
+	var to int
 	recipientWSConn, ok := connStore.GetConn(message.ToName)
 	if !ok {
 		recipient, err := user.GetByCredential(message.ToName)
@@ -41,7 +41,7 @@ func HandleMessages(username, userId string, messageByte []byte, conn *websocket
 			fmt.Println("user not found")
 			return
 		}
-		to = fmt.Sprintf("%d", recipient.Id)
+		to = recipient.Id
 	}
 	if err := messages.CreateMessage(userId, to, message.Message); err != nil {
 		println("create messsage error:", err.Error())
