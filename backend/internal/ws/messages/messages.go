@@ -36,14 +36,17 @@ func HandleMessages(username, userId string, messageByte []byte, conn *websocket
 		if err != nil {
 			if err := conn.WriteControl(websocket.CloseMessage, []byte("user not found"), time.Now()); err != nil {
 				fmt.Println("couldn't notify user", err)
-
+				return
 			}
 			fmt.Println("user not found")
 			return
 		}
 		to = fmt.Sprintf("%d", recipient.Id)
 	}
-	messages.CreateMessage(userId, to, message.Message)
+	if err := messages.CreateMessage(userId, to, message.Message); err != nil {
+		println("create messsage error:", err.Error())
+		return
+	}
 	if ok {
 		to = recipientWSConn.Id
 		recipientWSConn.Conn.WriteJSON(SendMessage{From: username, Message: message.Message, Type: "message:recieve"})

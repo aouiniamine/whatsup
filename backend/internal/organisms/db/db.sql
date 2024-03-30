@@ -12,3 +12,18 @@ CREATE TABLE connection_req (
 	req_time TIMESTAMP
 
 )
+
+CREATE TABLE messages(
+   id serial PRIMARY KEY,
+   sender INT,
+   recipient INT,
+   message_content VARCHAR(255) NOT NULL,
+   CONSTRAINT fk_sender
+      FOREIGN KEY(sender) 
+	    REFERENCES users(id)
+	        ON DELETE SET NULL,
+   CONSTRAINT fk_recipient
+      FOREIGN KEY(sender) 
+	    REFERENCES users(id)
+	        ON DELETE SET NULL
+)
