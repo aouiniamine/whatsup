@@ -8,12 +8,16 @@ import Connect from './src/Screens/Connect';
 import Register from './src/Screens/Register';
 import Validate from './src/Screens/Validate';
 import MessagesProvider from './src/Context/MessagesProvider';
+import { Provider } from 'react-redux';
+import store from './src/utils/Redux/store';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
-    <MessagesProvider>
+    <Provider store={store}>
+      <MessagesProvider>
+
       <NavigationContainer>
         <Stack.Navigator screenOptions={{headerShown: false}} initialRouteName='Connect'>
           <Stack.Screen name="Home" component={Home} />
@@ -23,6 +27,7 @@ export default function App() {
         </Stack.Navigator>
       </NavigationContainer>
     </MessagesProvider>
+    </Provider>
   );
 }
 

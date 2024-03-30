@@ -2,6 +2,8 @@ import {createContext, useState, useEffect, useRef} from "react"
 import { SERVER } from "../utils/Repo/envirement"
 import { getToken } from "../utils/Repo/secureStorage"
 import { getUser } from "../utils/Repo/Auth"
+import { useDispatch } from "react-redux"
+import { addMessage } from "../utils/Redux/reducer"
 // import { socket } from "../utils/Repo/socket"
 export const MessagesContext = createContext()
 
@@ -10,25 +12,10 @@ export default function MessagesProvider ({ children }){
     const [username, setUsername] = useState(null)
     const WSRef = useRef(null)
     const [isOpen, setIsOpen] = useState(false)
-    const [chats, setChats] = useState([])
-
-    const recieveMessage = (message, chats) =>{
-        for (let i in chats){
-            let conv = chats[i]
-            for(let j in conv){
-                const convMessage = conv[j]
-                if (convMessage.username === message.username){
-                    chats[i].push(message)
-                    return chats
-                }
-                if (convMessage.username !== username || convMessage.username !== message.username){
-                    break
-                }
-            }
-        }
-        chats.push([message])
-        return chats
+    const dispatch = useDispatch()
+    const recieveMessage = (message) =>{
         
+        dispatch(addMessage(message))
     }
 
     const sendMessage = (username, message) =>{
@@ -62,10 +49,9 @@ export default function MessagesProvider ({ children }){
                         switch(messageData.type){
                             case "message:recieve":
                                 const {username, message} = messageData
-                                const updatedChats = recieveMessage({username, message}, chats)
+                                
                                 console.log("message from", username, "is recieved")
-                                console.log(updatedChats)
-                                setChats(updatedChats)
+                                recieveMessage({message, username})
                                 break;
                             default:
                                 console.log("Still working on it!")
@@ -87,7 +73,7 @@ export default function MessagesProvider ({ children }){
         
     }   , [token])
     return (
-        <MessagesContext.Provider value={{setToken, sendMessage, chats}}>
+        <MessagesContext.Provider value={{setToken, sendMessage, username}}>
             {children}
         </MessagesContext.Provider>
     )

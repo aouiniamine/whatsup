@@ -6,24 +6,30 @@ import { FontAwesome } from '@expo/vector-icons';
 import { darkgreen, lightgreen } from "../Styles/GlobalStyles"
 import SendMessage from "../components/atoms/SendMessage"
 import { MessagesContext } from "../Context/MessagesProvider";
+import store from "../utils/Redux/store";
+import { connect, useSelector } from "react-redux";
+import { messageStateToProps } from "../utils/Redux/reducer";
 
-const Home = ({navigation}) =>{
+const Home = ({navigation, lastMessages}) =>{
     const [sendingMesssage, setSendingMessage] = useState(false)
     const closeForm = ()=> setSendingMessage(false)
     const openForm = ()=>setSendingMessage(true)
-    const {chats} = useContext(MessagesContext)
-    const dummyChats = [
-        {message: "Heyyyyy!ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", name: "Jhon Doe", image: ""}, 
-        {message: "Heyy I'd love tooo!!", name: "Diana Doe", image: ""}
-    ]
+    const [showMessage, setShowMessage] = useState(false)
+    const allMessages = useSelector(state => state.allMessages)
     // useEffect(()=>{removeToken(); navigation.navigate("Connect")}, [])
-    const renderChat = ({item, i}) =>{
-        const lastMessage = item[item.length-1]
-        console.log(lastMessage)
+    const renderChat = (convo, i) =>{
+        const lastMessage = convo[convo.length-1]
         return <Message key={i} name={lastMessage.username} message={lastMessage.message}/>
     }
 
-    // useEffect(()=>{console.log(chats)}, [chats])
+    useEffect(()=>{
+        // temporary solution to fix rerender issue on state change 
+        setShowMessage(false)
+        setTimeout(()=>{
+            setShowMessage(true)
+        }, 0)
+
+    }, [allMessages])
     return (
         <>
 
@@ -33,7 +39,8 @@ const Home = ({navigation}) =>{
 
             </TouchableOpacity>
             {sendingMesssage && <SendMessage isVisible={sendingMesssage} closeForm={closeForm}/>}
-            <FlatList data={chats} renderItem={renderChat}/>
+            {/* <FlatList data={allMessages} renderItem={renderChat}/> */}
+            {showMessage && allMessages.map(renderChat)}
         </>
     )
 }
@@ -54,4 +61,12 @@ const style = StyleSheet.create({
         zIndex: 200
     }
 })
+
+// export const lastMessagesToProps = state => {
+//     // passing only what's needed as props
+//     const {allMessages} = state
+//     const lastMessages = allMessages.map(chat => chat[chat.length-1])
+//     return {lastMessages}
+// }
+// export default connect(lastMessagesToProps)(Home)
 export default Home
