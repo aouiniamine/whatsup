@@ -4,14 +4,14 @@ import { darkgreen, lightgreen, lightgrey, windowWidth } from "../Styles/GlobalS
 import { useContext, useState } from "react"
 import CustomButton from "../components/atoms/CustomButton"
 import { validate } from "../utils/Repo/Auth"
-import { MessagesContext } from "../Context/MessagesProvider"
+import { WSContext } from "../Context/WSProvider"
 
 const Validate = ({route, navigation}) =>{
     const {email} = route.params;
     const [code, setCode ] = useState("")
     const [error, setError] = useState('')
     const login = ()=> navigation.navigate("Register")
-    const {setToken} = useContext(MessagesContext)
+    const {setToken} = useContext(WSContext)
     const onValidate = async() =>{
         try{
             const body ={

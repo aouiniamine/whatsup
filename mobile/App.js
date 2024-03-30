@@ -7,7 +7,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Connect from './src/Screens/Connect';
 import Register from './src/Screens/Register';
 import Validate from './src/Screens/Validate';
-import MessagesProvider from './src/Context/MessagesProvider';
+import WSProvider from './src/Context/WSProvider';
 import { Provider } from 'react-redux';
 import store from './src/utils/Redux/store';
 
@@ -16,7 +16,7 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <Provider store={store}>
-      <MessagesProvider>
+      <WSProvider>
 
       <NavigationContainer>
         <Stack.Navigator screenOptions={{headerShown: false}} initialRouteName='Connect'>
@@ -26,7 +26,7 @@ export default function App() {
           <Stack.Screen name='Validate' component={Validate} />
         </Stack.Navigator>
       </NavigationContainer>
-    </MessagesProvider>
+    </WSProvider>
     </Provider>
   );
 }

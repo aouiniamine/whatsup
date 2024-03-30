@@ -5,7 +5,6 @@ import { useContext, useEffect, useState } from "react"
 import { FontAwesome } from '@expo/vector-icons';
 import { darkgreen, lightgreen } from "../Styles/GlobalStyles"
 import SendMessage from "../components/atoms/SendMessage"
-import { MessagesContext } from "../Context/MessagesProvider";
 import store from "../utils/Redux/store";
 import { connect, useSelector } from "react-redux";
 import { messageStateToProps } from "../utils/Redux/reducer";

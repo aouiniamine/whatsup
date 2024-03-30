@@ -5,9 +5,9 @@ import { getUser } from "../utils/Repo/Auth"
 import { useDispatch } from "react-redux"
 import { addMessage } from "../utils/Redux/reducer"
 // import { socket } from "../utils/Repo/socket"
-export const MessagesContext = createContext()
+export const WSContext = createContext()
 
-export default function MessagesProvider ({ children }){
+export default function WSProvider ({ children }){
     const [token, setToken ] = useState(null)
     const [username, setUsername] = useState(null)
     const WSRef = useRef(null)
@@ -73,8 +73,8 @@ export default function MessagesProvider ({ children }){
         
     }   , [token])
     return (
-        <MessagesContext.Provider value={{setToken, sendMessage, username}}>
+        <WSContext.Provider value={{setToken, sendMessage, username}}>
             {children}
-        </MessagesContext.Provider>
+        </WSContext.Provider>
     )
 }

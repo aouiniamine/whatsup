@@ -2,14 +2,14 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { darkgreen, warningRed } from "../../Styles/GlobalStyles";
 import CustomInput from "./CustomInput";
-import { MessagesContext } from "../../Context/MessagesProvider";
+import { WSContext } from "../../Context/WSProvider";
 import { validateUsername } from "../../utils/general";
 
 
 export default function SendMessage ({isVisible, closeForm}){
     const [to, setTo ] = useState("")
     const [message, setMesssage] = useState("")
-    const {sendMessage} = useContext(MessagesContext)
+    const {sendMessage} = useContext(WSContext)
     const [invalidUsernameErr, setInvalidUsernameErr] = useState(false) 
     const handleSend = ()=>{
         if(validateUsername(to)){
