@@ -3,13 +3,12 @@ import { Avatar } from 'react-native-elements';
 import { nameStyle, windowWidth } from "../../Styles/GlobalStyles";
 import { useEffect, useState } from "react";
 const Message = ({message, name, image,}) =>{
-    const [showMessage, setShowMessage] = useState(message)
+    const [showMessage, setShowMessage] = useState('')
     useEffect(()=>{
         if (message.length > 27){
-            let msg = message.slice(0, 27).concat("...")
+            const msg = message.slice(0, 27).concat("...")
             setShowMessage(msg)
-        
-        }
+        } else setShowMessage(message)
     }, [message])
     return (
         <View style={style.container}>
