@@ -43,13 +43,14 @@ func HandleMessages(username string, userId int, messageByte []byte, conn *webso
 		}
 		to = recipient.Id
 	}
-	if err := messages.CreateMessage(userId, to, message.Message); err != nil {
-		println("create messsage error:", err.Error())
-		return
-	}
+
 	if ok {
 		to = recipientWSConn.Id
 		recipientWSConn.Conn.WriteJSON(SendMessage{From: username, Message: message.Message, Type: "message:recieve"})
+	}
+	if err := messages.CreateMessage(userId, to, message.Message); err != nil {
+		println("create messsage error:", err.Error())
+		return
 	}
 	log.Println(username, " is sending to: ", message.ToName, ", ", to, ": ", message.Message)
 }
