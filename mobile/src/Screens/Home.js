@@ -13,22 +13,13 @@ const Home = ({navigation, lastMessages}) =>{
     const [sendingMesssage, setSendingMessage] = useState(false)
     const closeForm = ()=> setSendingMessage(false)
     const openForm = ()=>setSendingMessage(true)
-    const [showMessage, setShowMessage] = useState(false)
-    const allMessages = useSelector(state => state.allMessages)
     // useEffect(()=>{removeToken(); navigation.navigate("Connect")}, [])
-    const renderChat = (convo, i) =>{
-        const lastMessage = convo[convo.length-1]
-        return <Message key={i} name={lastMessage.username} message={lastMessage.message}/>
+
+    const renderChat = ({item, i}) =>{
+        // const lastMessage = convo[convo.length-1]
+        return <Message key={i} name={item.username} message={item.message}/>
     }
 
-    useEffect(()=>{
-        // temporary solution to fix rerender issue on state change 
-        setShowMessage(false)
-        setTimeout(()=>{
-            setShowMessage(true)
-        }, 0)
-
-    }, [allMessages])
     return (
         <>
 
@@ -38,8 +29,7 @@ const Home = ({navigation, lastMessages}) =>{
 
             </TouchableOpacity>
             {sendingMesssage && <SendMessage isVisible={sendingMesssage} closeForm={closeForm}/>}
-            {/* <FlatList data={allMessages} renderItem={renderChat}/> */}
-            {showMessage && allMessages.map(renderChat)}
+            <FlatList data={lastMessages} renderItem={renderChat}/>
         </>
     )
 }
@@ -61,11 +51,11 @@ const style = StyleSheet.create({
     }
 })
 
-// export const lastMessagesToProps = state => {
-//     // passing only what's needed as props
-//     const {allMessages} = state
-//     const lastMessages = allMessages.map(chat => chat[chat.length-1])
-//     return {lastMessages}
-// }
-// export default connect(lastMessagesToProps)(Home)
-export default Home
+export const lastMessagesToProps = state => {
+    // passing only what's needed as props
+    const messages = new Array(...state.allMessages)
+    const lastMessages = messages.map(chat => chat[chat.length-1])
+    return {lastMessages}
+}
+export default connect(lastMessagesToProps)(Home)
+// export default Home
