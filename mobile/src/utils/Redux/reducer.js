@@ -1,28 +1,30 @@
 import { createSlice, configureStore } from '@reduxjs/toolkit'
-
+import {produce} from "immer"
 export const messagesSlice = createSlice({
   name: 'messages',
   initialState: {
     allMessages: []
   },
   reducers: {
-    addMessage: (state, message) => {
-        const allMessages = state.allMessages
-        for (let i in allMessages){
-            let conv = allMessages[i]
+    addMessage: (state, action) => {
+      return produce(state, draft =>{
+        
+        for (let i in draft.allMessages){
+            let conv = draft.allMessages[i]
             for(let j in conv){
                 const convMessage = conv[j]
-                if (convMessage.username === message.payload.username){
-                    allMessages[i].push(message.payload)
-                    state.allMessages = allMessages
+                if (convMessage.username === action.payload.username){
+                    draft.allMessages[i].push(action.payload)
                     return
                 }
-                if (convMessage.username !== username || convMessage.username !== message.payload.username){
+                if (convMessage.username !== username || convMessage.username !== action.payload.username){
                     break
                 }
             }
         }
-        allMessages.push([message.payload])
+        draft.allMessages.push([action.payload])
+        
+      })
         
     },
   }
